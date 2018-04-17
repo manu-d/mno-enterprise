@@ -17,6 +17,12 @@ module MnoEnterprise
       render :show
     end
 
+    # GET /mnoe/jpi/v1/admin/tenant/restart_status
+    def restart_status
+      status = MnoEnterprise::SystemManager.restart_status
+      render json: { status: status }
+    end
+
     # PATCH /mnoe/jpi/v1/admin/tenant/domain
     def update_domain
       @tenant = MnoEnterprise::Tenant.show

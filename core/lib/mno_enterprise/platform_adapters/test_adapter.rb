@@ -9,6 +9,10 @@ module MnoEnterprise
         def restart
         end
 
+        def restart_status
+          'success'
+        end
+
         # @see MnoEnterprise::PlatformAdapters::Adapter#publish_assets
         def publish_assets
         end

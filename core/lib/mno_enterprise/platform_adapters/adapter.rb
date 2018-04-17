@@ -10,6 +10,11 @@ module MnoEnterprise
           raise NotImplementedError
         end
 
+        # Check if the app restart has finished
+        def restart_done?
+          raise NotImplementedError
+        end
+
         # Delete frontend assets from the persistence layer
         def clear_assets
           raise NotImplementedError

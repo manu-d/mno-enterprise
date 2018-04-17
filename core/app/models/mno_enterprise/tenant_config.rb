@@ -100,7 +100,10 @@ module MnoEnterprise
     #
     # @return [Hash] Tenant configuration
     def self.fetch_tenant_config
-      MnoEnterprise::Tenant.show.frontend_config
+      config = MnoEnterprise::Tenant.show.frontend_config
+      config['system'] ||= {}
+      config['system']['config_timestamp'] = Time.now.to_i
+      config
     rescue JsonApiClient::Errors::ConnectionError
       Rails.logger.warn "Couldn't get configuration from MnoHub"
       puts "Couldn't get configuration from MnoHub"

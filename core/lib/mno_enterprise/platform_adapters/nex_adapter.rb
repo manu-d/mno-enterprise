@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-gem 'nex_client', '~> 0.16.0'
+gem 'nex_client', '~> 0.17.0'
 require 'nex_client'
 require 'rake'
 
@@ -41,7 +41,34 @@ module MnoEnterprise
           # nex_app.restart
           # puts "success" unless nex_app.errors.any?
 
+          current_timestamp = Settings.system.config_timestamp
+          cmds = [
+            "ts=#{current_timestamp}",
+            "while [ $ts -le #{current_timestamp} ]; do ts=$(echo `curl -s -X GET http://localhost/mnoe/config.json` | sed 's/[{}]//g' | awk '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | grep config_timestamp | grep -o '[0-9]\+'); done"
+          ]
+          c = NexClient::ExecCmd.create( {
+            name: "check restart timestamp",
+            script: cmds,
+            local: false,
+            relationships: {
+              executor: {
+                data: {
+                  type: nex_app.type,
+                  id: nex_app.id
+                }
+              }
+            }
+          }.with_indifferent_access)
+
+          c.execute
+
           FileUtils.touch('tmp/restart.txt')
+        end
+
+        def restart_status
+          setup_nex_client
+          cmd = NexClient::ExecCmd.where("app.name": "innovative-whale").order(:created_at).last
+          cmd.status
         end
 
         # @see MnoEnterprise::PlatformAdapters::Adapter#clear_assets
@@ -125,7 +152,7 @@ module MnoEnterprise
         def nex_app
           @nex_app ||= begin
             setup_nex_client
-            NexClient::App.find(ENV['SELF_NEX_APP_ID']).first
+            NexClient::App.where(name: ENV['SELF_NEX_APP_NAME']).first
           end
         end
 
