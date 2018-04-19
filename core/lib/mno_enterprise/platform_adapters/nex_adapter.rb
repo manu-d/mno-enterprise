@@ -67,7 +67,7 @@ module MnoEnterprise
 
         def restart_status
           setup_nex_client
-          cmd = NexClient::ExecCmd.where("app.name": "innovative-whale").order(:created_at).last
+          cmd = NexClient::ExecCmd.where("app.name": ENV['SELF_NEX_APP_NAME']).order(:created_at).last
           cmd.status
         end
 
